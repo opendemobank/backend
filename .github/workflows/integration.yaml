@@ -24,6 +24,7 @@ jobs:
         with:
           java-version: '17'
           distribution: ${{ matrix.distribution }}
+          cache: 'maven'
 
       - name: Compile the project
         run: mvn compile
