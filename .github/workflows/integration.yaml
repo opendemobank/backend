@@ -25,5 +25,8 @@ jobs:
           java-version: '17'
           distribution: ${{ matrix.distribution }}
 
+      - name: Compile the project
+        run: mvn compile
+
       - name: Run unit tests
         run: mvn test
