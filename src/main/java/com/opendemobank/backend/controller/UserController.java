@@ -18,7 +18,7 @@ public class UserController {
     UsersRepo usersRepo;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable("id") long id) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
         User user = usersRepo.findById(id);
         if (user == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -26,11 +26,11 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> findAll() {
+    public ResponseEntity<List<User>> getAll() {
         return new ResponseEntity<>(usersRepo.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<User> addAdmin(@RequestBody Administrator user) {
         return new ResponseEntity<>(usersRepo.save(user), HttpStatus.CREATED);
     }

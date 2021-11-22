@@ -1,10 +1,12 @@
 package com.opendemobank.backend.domain;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-public class Customer extends User implements ICustomer {
+@DiscriminatorValue("user")
+public class Customer extends User {
 
     @Column(name = "full_name")
     private String fullName;

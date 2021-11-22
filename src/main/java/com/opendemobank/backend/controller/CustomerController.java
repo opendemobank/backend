@@ -25,11 +25,11 @@ public class CustomerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> findAll() {
+    public ResponseEntity<List<Customer>> getAll() {
         return new ResponseEntity<>(customersRepo.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         return new ResponseEntity<>(customersRepo.save(customer), HttpStatus.CREATED);
