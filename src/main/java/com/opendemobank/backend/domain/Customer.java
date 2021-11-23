@@ -40,7 +40,6 @@ public class Customer extends User {
         return "Customer{" +
                 "id=" + this.getId() +
                 ", email='" + this.getEmail() + '\'' +
-                ", password='" + this.getPassword() + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
