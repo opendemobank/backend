@@ -1,43 +1,21 @@
 package com.opendemobank.backend;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CustomerControllerTest {
-
-    private String BEARER_TOKEN;
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        BEARER_TOKEN = getAdminBearerToken();
-    }
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    public String getAdminBearerToken() throws Exception {
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/users/login")
-                .param("email", "admin@opendemobank.com")
-                .param("password", "admin");
-
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-
-        return result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-    }
+public class CustomerControllerTest extends BaseTest {
 
     String exampleCustomerJson = "{\n" +
             "    \"email\": \"paul@pahkel.ee\",\n" +
@@ -53,13 +31,11 @@ public class CustomerControllerTest {
             "}";
 
 
-
-
     @Test
-    public void testAddCustomer() throws Exception {
+    public void testAddCustomerAsAdmin() throws Exception {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/customers/")
-                .header("Authorization", "Bearer " + BEARER_TOKEN)
+                .header("Authorization", "Bearer " + DEFAULT_ADMIN_BEARER_TOKEN)
                 .accept(MediaType.APPLICATION_JSON).content(exampleCustomerJson)
                 .header("charset", "utf-8")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -68,5 +44,17 @@ public class CustomerControllerTest {
 
         JSONAssert.assertEquals(validationString, result.getResponse()
                 .getContentAsString(StandardCharsets.UTF_8), false);
+    }
+
+    @Test
+    public void testAddCustomerAsCustomer() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/customers/")
+                .header("Authorization", "Bearer " + DEFAULT_CUSTOMER_BEARER_TOKEN)
+                .accept(MediaType.APPLICATION_JSON).content(exampleCustomerJson)
+                .header("charset", "utf-8")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder).andExpect(status().isUnauthorized());
     }
 }
