@@ -1,8 +1,7 @@
 package com.opendemobank.backend.domain;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("user")
@@ -13,6 +12,9 @@ public class Customer extends User {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Account> accounts;
 
     public String getFullName() {
         return fullName;
@@ -28,6 +30,14 @@ public class Customer extends User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
     }
 
     @Override
