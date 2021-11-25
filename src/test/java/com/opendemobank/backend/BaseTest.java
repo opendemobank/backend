@@ -12,11 +12,13 @@ import java.nio.charset.StandardCharsets;
 public class BaseTest {
     public String DEFAULT_ADMIN_BEARER_TOKEN;
     public String DEFAULT_CUSTOMER_BEARER_TOKEN;
+    public String DEFAULT_CUSTOMER_2_BEARER_TOKEN;
 
     @BeforeEach
     public void setUp() throws Exception {
         DEFAULT_ADMIN_BEARER_TOKEN = getBearerToken("admin@opendemobank.com", "admin");
         DEFAULT_CUSTOMER_BEARER_TOKEN = getBearerToken("customer@opendemobank.com", "customer");
+        DEFAULT_CUSTOMER_2_BEARER_TOKEN = getBearerToken("customer2@opendemobank.com", "customer2");
     }
 
     @Autowired
