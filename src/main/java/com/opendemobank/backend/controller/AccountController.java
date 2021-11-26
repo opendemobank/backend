@@ -4,6 +4,7 @@ import com.opendemobank.backend.domain.Account;
 import com.opendemobank.backend.domain.Role;
 import com.opendemobank.backend.domain.User;
 import com.opendemobank.backend.repository.AccountsRepo;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class AccountController {
     AccountsRepo accountsRepo;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountById(@AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
+    public ResponseEntity<Account> getAccountById(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
         Account account = accountsRepo.findById(id);
 
         if (account == null) {
@@ -40,14 +41,14 @@ public class AccountController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Account>> getAll(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<Account>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         return new ResponseEntity<>(accountsRepo.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/customer/{id}")
-    public ResponseEntity<List<Account>> getAccountsByCustomerId(@AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
+    public ResponseEntity<List<Account>> getAccountsByCustomerId(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         List<Account> accounts = accountsRepo.findByCustomer_Id(id);
@@ -58,7 +59,7 @@ public class AccountController {
     }
 
     @GetMapping("/customer")
-    public ResponseEntity<List<Account>> getCustomerAccounts(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<Account>> getCustomerAccounts(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser) {
         if (!currentUser.getRole().equals(Role.USER)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         List<Account> accounts = accountsRepo.findByCustomer_Id(currentUser.getId());
