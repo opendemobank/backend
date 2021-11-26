@@ -21,8 +21,8 @@ public class Transaction {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "date_time")
-    private LocalDateTime dateTime;
+    @Column(name = "local_date_time")
+    private LocalDateTime localDateTime;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "transaction", cascade = CascadeType.ALL)
     private List<TransactionRecord> transactionRecords;
@@ -48,11 +48,11 @@ public class Transaction {
     }
 
     public LocalDateTime getDateTime() {
-        return dateTime;
+        return localDateTime;
     }
 
     public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+        this.localDateTime = dateTime;
     }
 
     public List<TransactionRecord> getTransactionRecords() {

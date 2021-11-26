@@ -2,21 +2,20 @@ package com.opendemobank.backend.repository;
 
 import com.opendemobank.backend.domain.Account;
 import com.opendemobank.backend.domain.Transaction;
+import com.opendemobank.backend.domain.TransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionsRepo extends JpaRepository<Transaction, Long> {
 
-    Transaction getById(long id);
+    Transaction findById(long id);
 
-    List<Transaction> getAll();
+    List<Transaction> findAllByLocalDateTimeBetween(LocalDateTime from, LocalDateTime to);
 
-    List<Transaction> getByAccountId(long id);
+    List<Transaction> findAllByTransactionStatus(TransactionStatus transactionStatus);
 
-    List<Transaction> getByAccount(Account account);
-
-    Boolean add(Transaction transaction);
-
-    Boolean update(Transaction transaction);
+    // List<Transaction> findAllBy_sessionUserId(long id);
 
 }
