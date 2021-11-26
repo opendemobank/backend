@@ -1,10 +1,8 @@
 package com.opendemobank.backend;
 
-import com.opendemobank.backend.domain.Account;
-import com.opendemobank.backend.domain.AccountType;
-import com.opendemobank.backend.domain.Administrator;
-import com.opendemobank.backend.domain.Customer;
+import com.opendemobank.backend.domain.*;
 import com.opendemobank.backend.repository.AccountsRepo;
+import com.opendemobank.backend.repository.TransactionsRepo;
 import com.opendemobank.backend.repository.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -23,6 +21,9 @@ public class DemoData {
 
     @Autowired
     AccountsRepo accountsRepo;
+
+    @Autowired
+    TransactionsRepo transactionsRepo;
 
     @EventListener
     public void appReady(ApplicationReadyEvent event) {
@@ -48,6 +49,11 @@ public class DemoData {
         account.setBalance(new BigDecimal(100));
         account.setCustomer(customer);
         accountsRepo.save(account);
+
+        // Create initial transaction for in memory database during development
+        Transaction transaction = new Transaction();
+        // TODO: fill fields
+        transactionsRepo.save(transaction);
 
         // Create second customer for in memory database during development
         Customer customer2 = new Customer();
