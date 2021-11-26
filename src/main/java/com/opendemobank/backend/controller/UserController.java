@@ -5,6 +5,7 @@ import com.opendemobank.backend.domain.Administrator;
 import com.opendemobank.backend.domain.Role;
 import com.opendemobank.backend.domain.User;
 import com.opendemobank.backend.repository.UsersRepo;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
+    public ResponseEntity<User> getUserById(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
         if (currentUser.getId() != id && !currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         User requestedUser = usersRepo.findById(id);
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<User>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         return new ResponseEntity<>(usersRepo.findAll(), HttpStatus.OK);
