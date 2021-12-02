@@ -1,0 +1,41 @@
+on:
+  push:
+    branches:
+      - main
+
+name: Deploy
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: appleboy/ssh-action@master
+      with:
+        host: "35.175.112.73"
+        username: ec2-user
+        key: ${{ secrets.KEY }}
+        working-directory: /home/ec2-user/backend
+        script: |
+          git pull
+
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: "35.175.112.73"
+        username: ec2-user
+        key: ${{ secrets.KEY }}
+        script: |
+          docker-compose up -d --build backend
+
+    - name: Cleanup
+      uses: appleboy/ssh-action@master
+      with:
+        host: "35.175.112.73"
+        username: ec2-user
+        key: ${{ secrets.KEY }}
+        script: |
+          docker image prune -a -f
+          docker system prune -f --volumes
+
