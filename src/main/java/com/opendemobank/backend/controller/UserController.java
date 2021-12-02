@@ -27,7 +27,7 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
+    public ResponseEntity<User> getUserById(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
         if (currentUser.getId() != id && !currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         User requestedUser = usersRepo.findById(id);
@@ -37,14 +37,14 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<User>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         return new ResponseEntity<>(usersRepo.findAll(), HttpStatus.OK);
     }
 
     @PostMapping()
-    public ResponseEntity<User> addAdmin(@AuthenticationPrincipal final User currentUser, @RequestBody Administrator user) {
+    public ResponseEntity<User> addAdmin(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @RequestBody Administrator user) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
