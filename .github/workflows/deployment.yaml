@@ -16,8 +16,8 @@ jobs:
         host: "35.175.112.73"
         username: ec2-user
         key: ${{ secrets.KEY }}
-        working-directory: /home/ec2-user/backend
         script: |
+          cd backend
           git pull
 
     - name: Deploy
