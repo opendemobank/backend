@@ -1,5 +1,6 @@
 .dockerignore
 .github
+.gitignore
 Dockerfile
 docker-compose.yaml
 mvnw
