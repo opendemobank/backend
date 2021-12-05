@@ -13,7 +13,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -52,10 +54,16 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    String login(@RequestParam("email") final String email, @RequestParam("password") final String password) {
-        return authentication
+    public ResponseEntity<Object> login(@RequestParam("email") final String email, @RequestParam("password") final String password) {
+        final String token = authentication
                 .login(email, password)
                 .orElseThrow(() -> new RuntimeException("Invalid email and/or password."));
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("token", token);
+        map.put("user", authentication.findByToken(token));
+
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
     @GetMapping("/current")
