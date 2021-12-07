@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -23,6 +24,10 @@ public abstract class User implements UserDetails {
 
     @Column(name = "password")
     private String password;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "sessionUser", cascade = CascadeType.ALL)
+    private List<Transaction> transactions;
+
 
     public Long getId() {
         return id;
@@ -42,6 +47,14 @@ public abstract class User implements UserDetails {
 
     public String getPassword() {
         return password;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 
     public abstract Role getRole();

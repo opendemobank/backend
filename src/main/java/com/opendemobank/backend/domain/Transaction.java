@@ -1,5 +1,7 @@
 package com.opendemobank.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +15,10 @@ public class Transaction {
     @Column(name = "id")
     private long id;
 
-    // TODO: sessionUser
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User sessionUser;
 
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;
@@ -29,6 +34,22 @@ public class Transaction {
 
     public long getId() {
         return id;
+    }
+
+//    public User getSessionUser() {
+//        return sessionUser;
+//    }
+//
+//    public void setSessionUser(User sessionUser) {
+//        this.sessionUser = sessionUser;
+//    }
+
+    public LocalDateTime getLocalDateTime() {
+        return localDateTime;
+    }
+
+    public void setLocalDateTime(LocalDateTime localDateTime) {
+        this.localDateTime = localDateTime;
     }
 
     public TransactionStatus getTransactionStatus() {
