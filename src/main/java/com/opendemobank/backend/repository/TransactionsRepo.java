@@ -12,6 +12,10 @@ public interface TransactionsRepo extends JpaRepository<Transaction, Long> {
 
     Transaction findById(long id);
 
+    List<Transaction> findAll();
+
+    List<Transaction> findAllBySessionUserId(long id);
+
     List<Transaction> findAllByLocalDateTimeBetween(LocalDateTime from, LocalDateTime to);
 
     List<Transaction> findAllByTransactionStatus(TransactionStatus transactionStatus);

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "transaction")
@@ -29,20 +28,23 @@ public class Transaction {
     @Column(name = "local_date_time")
     private LocalDateTime localDateTime;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "transaction", cascade = CascadeType.ALL)
-    private List<TransactionRecord> transactionRecords;
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "transaction")
+    private TransactionRecord creditTransactionRecord;
+
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "transaction")
+    private TransactionRecord debitTransactionRecord;
 
     public long getId() {
         return id;
     }
 
-//    public User getSessionUser() {
-//        return sessionUser;
-//    }
-//
-//    public void setSessionUser(User sessionUser) {
-//        this.sessionUser = sessionUser;
-//    }
+    public User getSessionUser() {
+        return sessionUser;
+    }
+
+    public void setSessionUser(User sessionUser) {
+        this.sessionUser = sessionUser;
+    }
 
     public LocalDateTime getLocalDateTime() {
         return localDateTime;
@@ -76,11 +78,19 @@ public class Transaction {
         this.localDateTime = dateTime;
     }
 
-    public List<TransactionRecord> getTransactionRecords() {
-        return transactionRecords;
+    public TransactionRecord getDebitTransactionRecord() {
+        return debitTransactionRecord;
     }
 
-    public void setTransactionRecords(List<TransactionRecord> transactionRecords) {
-        this.transactionRecords = transactionRecords;
+    public void setDebitTransactionRecord(TransactionRecord debitTransactionRecord) {
+        this.debitTransactionRecord = debitTransactionRecord;
+    }
+
+    public TransactionRecord getCreditTransactionRecord() {
+        return creditTransactionRecord;
+    }
+
+    public void setCreditTransactionRecord(TransactionRecord creditTransactionRecord) {
+        this.creditTransactionRecord = creditTransactionRecord;
     }
 }

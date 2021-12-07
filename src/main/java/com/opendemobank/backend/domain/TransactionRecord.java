@@ -25,10 +25,13 @@ public class TransactionRecord {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @ManyToOne
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "transaction_id")
-    @JsonIgnore
     private Transaction transaction;
+
+    @OneToOne
+    @JoinColumn(name = "currency", nullable = false)
+    private Currency currency;
 
     public long getId() {
         return id;
@@ -64,5 +67,13 @@ public class TransactionRecord {
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 }
