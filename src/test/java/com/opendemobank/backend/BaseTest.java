@@ -1,5 +1,6 @@
 package com.opendemobank.backend;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,7 +32,7 @@ public class BaseTest {
                 .param("password", password);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-
-        return result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
+        return json.getString("token");
     }
 }
