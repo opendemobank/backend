@@ -30,7 +30,7 @@ public class TransactionRecord {
     private Transaction transaction;
 
     @OneToOne
-    @JoinColumn(name = "currency", nullable = false)
+    @JoinColumn(name = "currency_id", nullable = false)
     private Currency currency;
 
     public long getId() {

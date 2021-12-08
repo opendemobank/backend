@@ -22,6 +22,9 @@ public class DemoData {
     AccountsRepo accountsRepo;
 
     @Autowired
+    TransfersRepo transfersRepo;
+
+    @Autowired
     TransactionsRepo transactionsRepo;
 
     @Autowired
@@ -72,24 +75,34 @@ public class DemoData {
         currency.setRate(new BigDecimal("1.0"));
         currencyRepo.save(currency);
 
+        // Create initial transfer for in memory database during development
+        Transfer transfer = new Transfer();
+        transfer.setSessionUser(customer);
+        transfer.setDescription("December's Salary");
+        transfer.setAccountIBAN(account1.getIBAN());
+        transfer.setReceiversFullName(account1.getCustomer().getFullName());
+        transfer.setAmount(new BigDecimal("20.0"));
+        transfersRepo.save(transfer);
+
         // Create initial transaction for in memory database during development
         Transaction transaction = new Transaction();
         transaction.setSessionUser(customer);
         transaction.setTransactionStatus(TransactionStatus.OK);
-        transaction.setDescription("December's Salary");
+        transaction.setTransfer(transfer);
+        transaction.setDescription(transfer.getDescription());
         transaction.setLocalDateTime(LocalDateTime.now());
 
         //Create initial transactionRecords for in memory database during development
         TransactionRecord debitTransactionRecord = new TransactionRecord();
-        debitTransactionRecord.setAccount(account);
-        debitTransactionRecord.setAmount(new BigDecimal("20.0"));
+        debitTransactionRecord.setAccount(accountsRepo.findByIBAN(transfer.getAccountIBAN()));
+        debitTransactionRecord.setAmount(transfer.getAmount());
         debitTransactionRecord.setDirection(Direction.DEBIT);
         debitTransactionRecord.setCurrency(currency);
         transactionsRecordRepo.save(debitTransactionRecord);
 
         TransactionRecord creditTransactionRecord = new TransactionRecord();
-        creditTransactionRecord.setAccount(account1);
-        creditTransactionRecord.setAmount(new BigDecimal("20.0"));
+        creditTransactionRecord.setAccount(account);
+        creditTransactionRecord.setAmount(transfer.getAmount());
         creditTransactionRecord.setDirection(Direction.CREDIT);
         creditTransactionRecord.setCurrency(currency);
         transactionsRecordRepo.save(creditTransactionRecord);

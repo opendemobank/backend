@@ -16,7 +16,7 @@ public class Account {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "iban")
+    @Column(name = "iban", unique = true)
     private String IBAN;
 
     @Column(name = "account_type")

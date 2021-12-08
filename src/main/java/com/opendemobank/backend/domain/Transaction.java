@@ -34,6 +34,10 @@ public class Transaction {
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "transaction")
     private TransactionRecord debitTransactionRecord;
 
+    @OneToOne
+    @JoinColumn(name = "transfer")
+    private Transfer transfer;
+
     public long getId() {
         return id;
     }
@@ -92,5 +96,13 @@ public class Transaction {
 
     public void setCreditTransactionRecord(TransactionRecord creditTransactionRecord) {
         this.creditTransactionRecord = creditTransactionRecord;
+    }
+
+    public Transfer getTransfer() {
+        return transfer;
+    }
+
+    public void setTransfer(Transfer transfer) {
+        this.transfer = transfer;
     }
 }
