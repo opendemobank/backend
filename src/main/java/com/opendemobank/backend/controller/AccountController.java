@@ -74,7 +74,7 @@ public class AccountController {
 
         Customer customer = customersRepo.findById(id);
         if (customer == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Account account = new Account();
         account.setBalance(new BigDecimal("0.0"));
@@ -92,4 +92,16 @@ public class AccountController {
         return new ResponseEntity<>(accountsRepo.save(newAccount), HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Customer> deleteAccount(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
+        if (!currentUser.getRole().equals(Role.ADMIN))
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        Account account = accountsRepo.findById(id);
+        if (account == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        customersRepo.delete(account.getCustomer());
+        return new ResponseEntity<>(account.getCustomer(), HttpStatus.OK);
+    }
 }

@@ -61,6 +61,19 @@ public class UserController {
         return new ResponseEntity<>(usersRepo.save(user), HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUser(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
+        if (!currentUser.getRole().equals(Role.ADMIN))
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        User user = usersRepo.findById(id);
+        if (user == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        usersRepo.delete(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestParam("email") final String email, @RequestParam("password") final String password) {
         final String token = authentication
