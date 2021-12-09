@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -42,8 +44,14 @@ public class CustomerController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Customer> createCustomer(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @RequestBody Customer customer) {
+    public ResponseEntity<Customer> createCustomer(
+            @Parameter(hidden = true) @AuthenticationPrincipal final User currentUser,
+            @Valid @RequestBody Customer customer,
+            @Parameter(hidden = true) BindingResult bindingResult) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        if (bindingResult.hasErrors())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         customer.setPassword(new BCryptPasswordEncoder().encode(customer.getPassword()));
         return new ResponseEntity<>(customersRepo.save(customer), HttpStatus.CREATED);
