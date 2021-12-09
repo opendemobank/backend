@@ -11,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +48,30 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<User> addAdmin(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @RequestBody Administrator user) {
+    public ResponseEntity<User> addAdmin(
+            @Parameter(hidden = true) @AuthenticationPrincipal final User currentUser,
+            @Valid @RequestBody Administrator user,
+            @Parameter(hidden = true) BindingResult bindingResult) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        if (bindingResult.hasErrors())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return new ResponseEntity<>(usersRepo.save(user), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUser(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
+        if (!currentUser.getRole().equals(Role.ADMIN))
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        User user = usersRepo.findById(id);
+        if (user == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        usersRepo.delete(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping("/login")
