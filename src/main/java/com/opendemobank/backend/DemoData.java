@@ -52,7 +52,7 @@ public class DemoData {
 
         // Create initial account for in memory database during development
         Account account = new Account();
-        account.setIBAN("EE909900123456789012");
+        account.setIBAN(Account.generateIBAN(1L));
         account.setAccountType(AccountType.PRIMARY);
         account.setOpenDate(new Date(1637776275000L));
         account.setBalance(new BigDecimal(100));
@@ -121,7 +121,7 @@ public class DemoData {
 
         // Create second account for in memory database during development
         Account account2 = new Account();
-        account2.setIBAN("EE909900123456700000");
+        account2.setIBAN(Account.generateIBAN(2L));
         account2.setAccountType(AccountType.PRIMARY);
         account2.setOpenDate(new Date(1637776875000L));
         account2.setBalance(new BigDecimal(50));

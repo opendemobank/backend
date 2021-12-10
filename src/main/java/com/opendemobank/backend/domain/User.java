@@ -1,10 +1,13 @@
 package com.opendemobank.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,9 +22,13 @@ public abstract class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
+    @Email
+    @NotNull
     @Column(name = "email")
     private String email;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
     @Column(name = "password")
     private String password;
 

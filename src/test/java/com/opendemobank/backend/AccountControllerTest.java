@@ -24,7 +24,7 @@ public class AccountControllerTest extends BaseTest {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        Assert.isTrue(result.getResponse().getContentAsString(StandardCharsets.UTF_8).contains("\"iban\":\"EE909900123456789012\""), "Response doesn't contain correct IBAN.");
+        Assert.isTrue(result.getResponse().getContentAsString(StandardCharsets.UTF_8).contains("\"iban\":\"EE801100000000000015\""), "Response doesn't contain correct IBAN.");
     }
 
     @Test
@@ -35,7 +35,7 @@ public class AccountControllerTest extends BaseTest {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        Assert.isTrue(result.getResponse().getContentAsString(StandardCharsets.UTF_8).contains("\"iban\":\"EE909900123456789012\""), "Response doesn't contain correct IBAN.");
+        Assert.isTrue(result.getResponse().getContentAsString(StandardCharsets.UTF_8).contains("\"iban\":\"EE801100000000000015\""), "Response doesn't contain correct IBAN.");
 
         /* Check that other customers can view only their own accounts */
         requestBuilder = MockMvcRequestBuilders

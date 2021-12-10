@@ -1,20 +1,24 @@
 package com.opendemobank.backend.domain;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @DiscriminatorValue("user")
 public class Customer extends User {
 
+    @NotNull
     @Column(name = "full_name")
     private String fullName;
 
+    @NotNull
     @Column(name = "phone_number")
     private String phoneNumber;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Account> accounts;
+    private List<Account> accounts = new ArrayList<>();
 
     public String getFullName() {
         return fullName;
