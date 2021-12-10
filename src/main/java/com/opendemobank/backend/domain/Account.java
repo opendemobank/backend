@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "account")
@@ -36,6 +37,9 @@ public class Account {
     @JoinColumn(name = "customer_id")
     @JsonIgnore
     private Customer customer;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "account", cascade = CascadeType.ALL)
+    private List<TransactionRecord> transactionRecords;
 
     public long getId() {
         return id;
@@ -79,6 +83,14 @@ public class Account {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public List<TransactionRecord> getTransactionRecords() {
+        return transactionRecords;
+    }
+
+    public void setTransactionRecords(List<TransactionRecord> transactionRecords) {
+        this.transactionRecords = transactionRecords;
     }
 
     @Override
