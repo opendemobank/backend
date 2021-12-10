@@ -87,11 +87,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.iban4j</groupId>
+            <artifactId>iban4j</artifactId>
+            <version>3.2.3-RELEASE</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-security</artifactId>
             <version>1.5.13</version>
         </dependency>
-
     </dependencies>
 
     <build>

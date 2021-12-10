@@ -40,6 +40,23 @@ public class AccountController {
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
+    @GetMapping("/iban/{iban}")
+    public ResponseEntity<Account> getAccountByIBAN(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("iban") String iban) {
+        Account account = accountsRepo.findByIBAN(iban);
+
+        if (account == null) {
+            if (currentUser.getRole().equals(Role.ADMIN))
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            else
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!currentUser.getId().equals(account.getCustomer().getId()) && !currentUser.getRole().equals(Role.ADMIN))
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<List<Account>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser) {
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
