@@ -65,8 +65,7 @@ public class TransactionController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Transaction> createTransaction(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @RequestBody Transaction newTransaction) {
         // if the session user is not the same as the one that is stated to have created the transaction
-        // or if the session user is not admin
-        if (!Objects.equals(currentUser.getId(), newTransaction.getSessionUser().getId()) && currentUser.getRole() != Role.ADMIN)
+        if (!Objects.equals(currentUser.getId(), newTransaction.getSessionUser().getId()))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         return new ResponseEntity<>(transactionsRepo.save(newTransaction), HttpStatus.CREATED);
