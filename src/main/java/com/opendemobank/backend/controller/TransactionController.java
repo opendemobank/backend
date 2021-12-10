@@ -1,6 +1,7 @@
 package com.opendemobank.backend.controller;
 
 import com.opendemobank.backend.domain.*;
+import com.opendemobank.backend.manager.TransactionManagers;
 import com.opendemobank.backend.repository.TransactionsRepo;
 import com.opendemobank.backend.repository.UsersRepo;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +24,9 @@ public class TransactionController {
 
     @Autowired
     UsersRepo usersRepo;
+
+    @Autowired
+    TransactionManagers transactionManagers;
 
     @GetMapping("/{id}")
     public ResponseEntity<Transaction> getById(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
@@ -63,13 +67,11 @@ public class TransactionController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Transaction> createTransaction(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @RequestBody Transaction newTransaction) {
-        // if the session user is not the same as the one that is stated to have created the transaction
-        if (!Objects.equals(currentUser.getId(), newTransaction.getSessionUser().getId()))
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<Transaction> createTransaction(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @RequestBody TransactionManagers.NewTransactionForm form) {
+        // if currentUser is not admin, return auth fail
+        if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        return new ResponseEntity<>(transactionsRepo.save(newTransaction), HttpStatus.CREATED);
-
+        return transactionManagers.createTransaction(currentUser, form);
     }
 
 
