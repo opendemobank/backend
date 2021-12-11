@@ -1,6 +1,7 @@
 package com.opendemobank.backend;
 
 import com.opendemobank.backend.domain.*;
+import com.opendemobank.backend.manager.TransactionManagers;
 import com.opendemobank.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -9,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
@@ -33,9 +33,18 @@ public class DemoData {
     @Autowired
     CurrencyRepo currencyRepo;
 
+    @Autowired
+    TransactionManagers transactionManagers;
 
     @EventListener
     public void appReady(ApplicationReadyEvent event) {
+        // Create initial currency for in memory database during development
+        Currency currency = new Currency();
+        currency.setCode("EUR");
+        currency.setName("Euro");
+        currency.setRate(new BigDecimal("1.0"));
+        currencyRepo.save(currency);
+
         // Create initial admin for in memory database during development
         Administrator admin = new Administrator();
         admin.setEmail("admin@opendemobank.com");
@@ -50,13 +59,6 @@ public class DemoData {
         customer.setPhoneNumber("+358 40 1234567");
         usersRepo.save(customer);
 
-        // Create initial currency for in memory database during development
-        Currency currency = new Currency();
-        currency.setCode("abc");
-        currency.setName("EUR");
-        currency.setRate(new BigDecimal("1.0"));
-        currencyRepo.save(currency);
-
         // Create initial account for in memory database during development
         Account account = new Account();
         account.setIBAN(Account.generateIBAN(1L));
@@ -66,52 +68,6 @@ public class DemoData {
         account.setCustomer(customer);
         account.setCurrency(currency);
         accountsRepo.save(account);
-
-        // Create initial account for in memory database during development
-        Account account1 = new Account();
-        account1.setIBAN("EE909900123456789013");
-        account1.setAccountType(AccountType.PRIMARY);
-        account1.setOpenDate(new Date(1637776275000L));
-        account1.setBalance(new BigDecimal(200));
-        account1.setCustomer(customer);
-        account1.setCurrency(currency);
-        accountsRepo.save(account1);
-
-        // Create initial transfer for in memory database during development
-        Transfer transfer = new Transfer();
-        transfer.setSessionUser(customer);
-        transfer.setDescription("December's Salary");
-        transfer.setAccountIBAN(account1.getIBAN());
-        transfer.setReceiversFullName(account1.getCustomer().getFullName());
-        transfer.setAmount(new BigDecimal("20.0"));
-        transfersRepo.save(transfer);
-
-        // Create initial transaction for in memory database during development
-        Transaction transaction = new Transaction();
-        transaction.setSessionUser(customer);
-        transaction.setTransactionStatus(TransactionStatus.OK);
-        transaction.setTransfer(transfer);
-        transaction.setDescription(transfer.getDescription());
-        transaction.setLocalDateTime(LocalDateTime.now());
-
-        //Create initial transactionRecords for in memory database during development
-        TransactionRecord debitTransactionRecord = new TransactionRecord();
-        debitTransactionRecord.setAccount(accountsRepo.findByIBAN(transfer.getAccountIBAN()));
-        debitTransactionRecord.setAmount(transfer.getAmount());
-        debitTransactionRecord.setDirection(Direction.DEBIT);
-        debitTransactionRecord.setCurrency(currency);
-        transactionsRecordRepo.save(debitTransactionRecord);
-
-        TransactionRecord creditTransactionRecord = new TransactionRecord();
-        creditTransactionRecord.setAccount(account);
-        creditTransactionRecord.setAmount(transfer.getAmount());
-        creditTransactionRecord.setDirection(Direction.CREDIT);
-        creditTransactionRecord.setCurrency(currency);
-        transactionsRecordRepo.save(creditTransactionRecord);
-
-        transaction.setDebitTransactionRecord(debitTransactionRecord);
-        transaction.setCreditTransactionRecord(creditTransactionRecord);
-        transactionsRepo.save(transaction);
 
         // Create second customer for in memory database during development
         Customer customer2 = new Customer();
@@ -130,5 +86,12 @@ public class DemoData {
         account2.setCustomer(customer2);
         account2.setCurrency(currency);
         accountsRepo.save(account2);
+
+        TransactionManagers.NewTransactionForm newTransaction = new TransactionManagers.NewTransactionForm();
+        newTransaction.setDescription("December's Salary");
+        newTransaction.setAmount(new BigDecimal("20.0"));
+        newTransaction.setOriginIban(account.getIBAN());
+        newTransaction.setEndIban(account2.getIBAN());
+        transactionManagers.createTransaction(customer, newTransaction);
     }
 }
