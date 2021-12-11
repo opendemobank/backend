@@ -40,12 +40,12 @@ public class TransferManagers {
         
         // Check if account exists
         if (senderAccount == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         
         // Check if user is owner of account
         if (!senderAccount.getCustomer().getId().equals(currentUser.getId())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         // Check if owner account has enough balance
@@ -74,7 +74,7 @@ public class TransferManagers {
         
         // Check if account exists
         if (!recipientAccount.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // Create debit transaction record
