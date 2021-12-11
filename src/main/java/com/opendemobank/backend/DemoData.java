@@ -43,14 +43,14 @@ public class DemoData {
         currency1.setCode("USD");
         currency1.setName("US Dollar");
         currency1.setRate(new BigDecimal("1.1273"));
-        currency1.setSymbol("¥");
+        currency1.setSymbol("$");
         currencyRepo.save(currency1);
 
         Currency currency2 = new Currency();
         currency2.setCode("CNY");
         currency2.setName("Chinese yuan renminbi");
         currency2.setRate(new BigDecimal("7.1814"));
-        currency2.setSymbol("$");
+        currency2.setSymbol("¥");
         currencyRepo.save(currency2);
 
         Currency currency3 = new Currency();
