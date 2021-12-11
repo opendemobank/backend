@@ -2,6 +2,7 @@ package com.opendemobank.backend.controller;
 
 import com.opendemobank.backend.domain.*;
 import com.opendemobank.backend.repository.AccountsRepo;
+import com.opendemobank.backend.repository.CurrencyRepo;
 import com.opendemobank.backend.repository.CustomersRepo;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class AccountController {
 
     @Autowired
     CustomersRepo customersRepo;
+
+    @Autowired
+    CurrencyRepo currencyRepo;
 
     @GetMapping("/{id}")
     public ResponseEntity<Account> getAccountById(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
@@ -94,6 +98,7 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Account account = new Account();
+        account.setCurrency(currencyRepo.getById(1L));
         account.setBalance(new BigDecimal("0.0"));
         account.setCustomer(customer);
 

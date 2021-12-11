@@ -38,6 +38,10 @@ public class Account {
     @JsonIgnore
     private Customer customer;
 
+    @ManyToOne
+    @JoinColumn(name = "currency_id")
+    private Currency currency;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "account", cascade = CascadeType.ALL)
     private List<TransactionRecord> transactionRecords;
 
@@ -91,6 +95,14 @@ public class Account {
 
     public void setTransactionRecords(List<TransactionRecord> transactionRecords) {
         this.transactionRecords = transactionRecords;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 
     @Override

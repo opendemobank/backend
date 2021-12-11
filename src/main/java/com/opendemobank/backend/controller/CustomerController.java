@@ -5,6 +5,7 @@ import com.opendemobank.backend.domain.Customer;
 import com.opendemobank.backend.domain.Role;
 import com.opendemobank.backend.domain.User;
 import com.opendemobank.backend.repository.AccountsRepo;
+import com.opendemobank.backend.repository.CurrencyRepo;
 import com.opendemobank.backend.repository.CustomersRepo;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class CustomerController {
 
     @Autowired
     AccountsRepo accountsRepo;
+
+    @Autowired
+    CurrencyRepo currencyRepo;
 
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomerById(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
@@ -62,6 +66,7 @@ public class CustomerController {
         customersRepo.saveAndFlush(customer);
         for (Account account : customer.getAccounts()) {
             account.setCustomer(customer);
+            account.setCurrency(currencyRepo.getById(1L));
             account.setIBAN(Account.generateIBAN(account.getId()));
         }
         return new ResponseEntity<>(customersRepo.save(customer), HttpStatus.CREATED);
