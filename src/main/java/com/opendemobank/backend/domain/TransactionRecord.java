@@ -1,6 +1,7 @@
 package com.opendemobank.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ public class TransactionRecord {
 
     @ManyToOne
     @JoinColumn(name = "account_id")
-    @JsonIgnore
+    @JsonIgnoreProperties({"transactionRecords"})
     private Account account;
 
     @Column(name = "direction")
@@ -78,3 +79,4 @@ public class TransactionRecord {
         this.currency = currency;
     }
 }
+
