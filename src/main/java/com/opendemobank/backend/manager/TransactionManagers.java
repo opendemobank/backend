@@ -140,6 +140,71 @@ public class TransactionManagers {
         return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 
+    public ResponseEntity<Transaction> stornoTransaction(User currentUser, long id, StronoTransactionForm form) {
+        // Check if transaction with id exists
+        Transaction transaction = transactionsRepo.findById(id);
+
+        // Check if transaction exists
+        if (transaction == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Check if transaction status is OK or CORECTION
+        if (transaction.getTransactionStatus() != TransactionStatus.OK && transaction.getTransactionStatus() != TransactionStatus.CORECTION) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Set transaction status to STORNED
+        transaction.setTransactionStatus(TransactionStatus.STORNED);
+
+        // Make new transaction reversing old transaction
+        Transaction newTransaction = new Transaction();
+        newTransaction.setLocalDateTime(transaction.getLocalDateTime());
+        newTransaction.setTransactionStatus(TransactionStatus.STORNO);
+        newTransaction.setSessionUser(currentUser);
+        newTransaction.setDescription("Storno of " + transaction.getId());
+        transactionsRepo.saveAndFlush(newTransaction);
+
+        // Create new credit and debit transaction records
+        TransactionRecord debitTransaction = new TransactionRecord();
+        TransactionRecord creditTransaction = new TransactionRecord();
+
+        // Set new transaction records
+        debitTransaction.setAmount(transaction.getCreditTransactionRecord().getAmount());
+        debitTransaction.setAccount(transaction.getCreditTransactionRecord().getAccount());
+        debitTransaction.setCurrency(transaction.getCreditTransactionRecord().getCurrency());
+        debitTransaction.setTransaction(newTransaction);
+        debitTransaction.setDirection(Direction.DEBIT);
+
+        creditTransaction.setAmount(transaction.getDebitTransactionRecord().getAmount());
+        creditTransaction.setAccount(transaction.getDebitTransactionRecord().getAccount());
+        creditTransaction.setCurrency(transaction.getDebitTransactionRecord().getCurrency());
+        creditTransaction.setTransaction(newTransaction);
+        creditTransaction.setDirection(Direction.CREDIT);
+
+        // Save new transaction records
+        transactionsRecordRepo.saveAndFlush(debitTransaction);
+        transactionsRecordRepo.saveAndFlush(creditTransaction);
+
+        // Save transaction
+        transactionsRepo.saveAndFlush(transaction);
+
+        // Get accounts
+        Account debitAccount = debitTransaction.getAccount();
+        Account creditAccount = creditTransaction.getAccount();
+
+        // Update account balances
+        creditAccount.setBalance(creditAccount.getBalance().add(creditTransaction.getAmount()));
+        debitAccount.setBalance(debitAccount.getBalance().subtract(debitTransaction.getAmount()));
+
+        // Save changes
+        accountsRepo.saveAndFlush(debitAccount);
+        accountsRepo.saveAndFlush(creditAccount);
+
+        // Return transaction
+        return new ResponseEntity<>(newTransaction, HttpStatus.OK);
+    }
+
     public static class NewTransactionForm {
         public String description;
         public String originIban;
@@ -207,5 +272,9 @@ public class TransactionManagers {
         public void setLocalDateTime(LocalDateTime localDateTime) {
             this.localDateTime = localDateTime;
         }
+    }
+
+    public class StronoTransactionForm {
+        public Long id;
     }
 }
