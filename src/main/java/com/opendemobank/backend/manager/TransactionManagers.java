@@ -37,14 +37,16 @@ public class TransactionManagers {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        // Create debit transaction record
         TransactionRecord debitTransaction = new TransactionRecord();
-
         debitTransaction.setAmount(form.getAmount());
         debitTransaction.setCurrency(currencyRepo.getById(1L)); // TODO fix currency
         debitTransaction.setAccount(originAccount);
         debitTransaction.setDirection(Direction.DEBIT);
         transactionsRecordRepo.saveAndFlush(debitTransaction);
 
+
+        // Create credit transaction record
         TransactionRecord creditTransaction = new TransactionRecord();
         creditTransaction.setCurrency(currencyRepo.getById(1L)); // TODO fix currency
         creditTransaction.setAmount(form.getAmount());
@@ -52,6 +54,7 @@ public class TransactionManagers {
         creditTransaction.setDirection(Direction.CREDIT);
         transactionsRecordRepo.saveAndFlush(creditTransaction);
 
+        // Create transfer
         Transfer transfer = new Transfer();
         transfer.setSessionUser(destinationAccount.getCustomer());
         transfer.setDescription(form.getDescription());
@@ -60,6 +63,8 @@ public class TransactionManagers {
         transfer.setAmount(form.getAmount());
         transfersRepo.saveAndFlush(transfer);
 
+
+        // Create Transaction
         Transaction transaction = new Transaction();
         transaction.setDebitTransactionRecord(debitTransaction);
         transaction.setCreditTransactionRecord(creditTransaction);
@@ -69,6 +74,12 @@ public class TransactionManagers {
         transaction.setSessionUser(currentUser);
         transaction.setTransfer(transfer);
         transactionsRepo.saveAndFlush(transaction);
+
+        // Update records with new transaction
+        debitTransaction.setTransaction(transaction);
+        creditTransaction.setTransaction(transaction);
+        transactionsRecordRepo.saveAndFlush(debitTransaction);
+        transactionsRecordRepo.saveAndFlush(creditTransaction);
 
         if (originAccount != null) {
             originAccount.setBalance(originAccount.getBalance().subtract(form.getAmount()));
