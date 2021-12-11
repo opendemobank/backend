@@ -20,6 +20,4 @@ public interface TransactionsRepo extends JpaRepository<Transaction, Long> {
 
     List<Transaction> findAllByTransactionStatus(TransactionStatus transactionStatus);
 
-    // List<Transaction> findAllBy_sessionUserId(long id);
-
 }
