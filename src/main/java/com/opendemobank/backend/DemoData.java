@@ -39,11 +39,26 @@ public class DemoData {
     @EventListener
     public void appReady(ApplicationReadyEvent event) {
         // Create initial currency for in memory database during development
-        Currency currency = new Currency();
-        currency.setCode("EUR");
-        currency.setName("Euro");
-        currency.setRate(new BigDecimal("1.0"));
-        currencyRepo.save(currency);
+        Currency currency1 = new Currency();
+        currency1.setCode("USD");
+        currency1.setName("US Dollar");
+        currency1.setRate(new BigDecimal("1.1273"));
+        currency1.setSymbol("$");
+        currencyRepo.save(currency1);
+
+        Currency currency2 = new Currency();
+        currency2.setCode("CNY");
+        currency2.setName("Chinese yuan renminbi");
+        currency2.setRate(new BigDecimal("7.1814"));
+        currency2.setSymbol("¥");
+        currencyRepo.save(currency2);
+
+        Currency currency3 = new Currency();
+        currency3.setCode("EUR");
+        currency3.setName("Euro");
+        currency3.setRate(new BigDecimal("1.0"));
+        currency3.setSymbol("€");
+        currencyRepo.save(currency3);
 
         // Create initial admin for in memory database during development
         Administrator admin = new Administrator();
@@ -66,7 +81,7 @@ public class DemoData {
         account.setOpenDate(new Date(1637776275000L));
         account.setBalance(new BigDecimal(100));
         account.setCustomer(customer);
-        account.setCurrency(currency);
+        account.setCurrency(currency3);
         accountsRepo.save(account);
 
         // Create second customer for in memory database during development
@@ -84,7 +99,7 @@ public class DemoData {
         account2.setOpenDate(new Date(1637776875000L));
         account2.setBalance(new BigDecimal(50));
         account2.setCustomer(customer2);
-        account2.setCurrency(currency);
+        account2.setCurrency(currency1);
         accountsRepo.save(account2);
 
         TransactionManagers.NewTransactionForm newTransaction = new TransactionManagers.NewTransactionForm();

@@ -98,7 +98,7 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Account account = new Account();
-        account.setCurrency(currencyRepo.getById(1L));
+        account.setCurrency(currencyRepo.findByCode("EUR"));
         account.setBalance(new BigDecimal("0.0"));
         account.setCustomer(customer);
 
