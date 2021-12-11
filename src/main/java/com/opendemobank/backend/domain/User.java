@@ -35,6 +35,9 @@ public abstract class User implements UserDetails {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sessionUser", cascade = CascadeType.ALL)
     private List<Transaction> transactions;
 
+    @JsonIgnore
+    @Column(name = "active")
+    private boolean active = true;
 
     public Long getId() {
         return id;
@@ -65,6 +68,15 @@ public abstract class User implements UserDetails {
     }
 
     public abstract Role getRole();
+
+    @JsonIgnore
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     @Override
     @JsonIgnore

@@ -115,7 +115,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteAccount(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
+    public ResponseEntity<Account> deleteAccount(@Parameter(hidden = true) @AuthenticationPrincipal final User currentUser, @PathVariable("id") long id) {
         if (!currentUser.getRole().equals(Role.ADMIN))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -123,7 +123,7 @@ public class AccountController {
         if (account == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        customersRepo.delete(account.getCustomer());
-        return new ResponseEntity<>(account.getCustomer(), HttpStatus.OK);
+        account.setActive(false);
+        return new ResponseEntity<>(accountsRepo.save(account), HttpStatus.OK);
     }
 }

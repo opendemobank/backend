@@ -46,7 +46,10 @@ public class Customer extends User {
 
     @Override
     public Role getRole() {
-        return Role.USER;
+        if (super.isActive())
+            return Role.USER;
+        else
+            return Role.INACTIVE;
     }
 
     @Override

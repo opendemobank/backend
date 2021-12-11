@@ -70,15 +70,17 @@ public class UserController {
         if (user == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        usersRepo.delete(user);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        user.setActive(false);
+        return new ResponseEntity<>(usersRepo.save(user), HttpStatus.OK);
     }
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestParam("email") final String email, @RequestParam("password") final String password) {
         final String token = authentication
-                .login(email, password)
-                .orElseThrow(() -> new RuntimeException("Invalid email and/or password."));
+                .login(email, password).orElse(null);
+
+        if (token == null)
+            return new ResponseEntity<>("Invalid email and/or password.", HttpStatus.UNAUTHORIZED);
 
         Map<String, Object> map = new HashMap<>();
         map.put("token", token);
