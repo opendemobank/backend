@@ -3,6 +3,7 @@ package com.opendemobank.backend.controller;
 import com.opendemobank.backend.domain.Role;
 import com.opendemobank.backend.domain.Transfer;
 import com.opendemobank.backend.domain.User;
+import com.opendemobank.backend.manager.TransferManagers;
 import com.opendemobank.backend.repository.TransfersRepo;
 import com.opendemobank.backend.repository.UsersRepo;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,9 @@ public class TransferController {
 
     @Autowired
     UsersRepo usersRepo;
+
+    @Autowired
+    TransferManagers transferManager;
 
     @GetMapping("/{id}")
     public ResponseEntity<Transfer> getById(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @PathVariable("id") long id) {
@@ -66,13 +70,8 @@ public class TransferController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Transfer> createTransfer(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @RequestBody Transfer newTransfer) {
-
-        // if the session user is not the same as the one that is stated to have created the transfer
-        if (!Objects.equals(currentUser.getId(), newTransfer.getSessionUser().getId()))
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-        return new ResponseEntity<>(transfersRepo.save(newTransfer), HttpStatus.CREATED);
+    public ResponseEntity<Transfer> createTransfer(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @RequestBody TransferManagers.CreateTransferForm form) {
+        return transferManager.createTransfer(currentUser, form);
     }
 
 

@@ -50,6 +50,13 @@ public class DemoData {
         customer.setPhoneNumber("+358 40 1234567");
         usersRepo.save(customer);
 
+        // Create initial currency for in memory database during development
+        Currency currency = new Currency();
+        currency.setCode("abc");
+        currency.setName("EUR");
+        currency.setRate(new BigDecimal("1.0"));
+        currencyRepo.save(currency);
+
         // Create initial account for in memory database during development
         Account account = new Account();
         account.setIBAN(Account.generateIBAN(1L));
@@ -57,6 +64,7 @@ public class DemoData {
         account.setOpenDate(new Date(1637776275000L));
         account.setBalance(new BigDecimal(100));
         account.setCustomer(customer);
+        account.setCurrency(currency);
         accountsRepo.save(account);
 
         // Create initial account for in memory database during development
@@ -66,14 +74,8 @@ public class DemoData {
         account1.setOpenDate(new Date(1637776275000L));
         account1.setBalance(new BigDecimal(200));
         account1.setCustomer(customer);
+        account1.setCurrency(currency);
         accountsRepo.save(account1);
-
-        // Create initial currency for in memory database during development
-        Currency currency = new Currency();
-        currency.setCode("abc");
-        currency.setName("EUR");
-        currency.setRate(new BigDecimal("1.0"));
-        currencyRepo.save(currency);
 
         // Create initial transfer for in memory database during development
         Transfer transfer = new Transfer();
@@ -126,6 +128,7 @@ public class DemoData {
         account2.setOpenDate(new Date(1637776875000L));
         account2.setBalance(new BigDecimal(50));
         account2.setCustomer(customer2);
+        account2.setCurrency(currency);
         accountsRepo.save(account2);
     }
 }
