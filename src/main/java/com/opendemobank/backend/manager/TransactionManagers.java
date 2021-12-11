@@ -268,7 +268,7 @@ public class TransactionManagers {
         }
     }
 
-    public class EditTransactionForm {
+    public static class EditTransactionForm {
         public Long id;
         public BigDecimal amount;
         public LocalDateTime localDateTime;
@@ -298,7 +298,7 @@ public class TransactionManagers {
         }
     }
 
-    public class StronoTransactionForm {
+    public static class StronoTransactionForm {
         public Long id;
 
         public Long getId() {
