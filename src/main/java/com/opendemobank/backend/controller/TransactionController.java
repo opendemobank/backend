@@ -75,7 +75,14 @@ public class TransactionController {
     }
 
 
-    // TODO edit transaction
+    // POST edit transaction
+    @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Transaction> editTransaction(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @PathVariable("id") long id, @RequestBody TransactionManagers.EditTransactionForm form) {
+        // if currentUser is not admin, return auth fail
+        if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        return transactionManagers.editTransaction(currentUser, id, form);
+    }
 
     // TODO storno transaction
 

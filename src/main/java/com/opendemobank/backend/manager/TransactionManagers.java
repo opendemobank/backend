@@ -92,6 +92,49 @@ public class TransactionManagers {
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 
+    public ResponseEntity<Transaction> editTransaction(User currentUser, long id, EditTransactionForm form) {
+        // Check if transaction with id exists
+        Transaction transaction = transactionsRepo.findById(id);
+
+        if (transaction == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Edit transaction timestamp and amount
+        transaction.setLocalDateTime(form.getLocalDateTime());
+        transaction.setTransactionStatus(TransactionStatus.CORECTION);
+
+        // Get debit and credit transaction records
+        TransactionRecord debitTransaction = transaction.getDebitTransactionRecord();
+        TransactionRecord creditTransaction = transaction.getCreditTransactionRecord();
+
+        // Get old amounts
+        BigDecimal oldDebitAmount = debitTransaction.getAmount();
+        BigDecimal oldCreditAmount = creditTransaction.getAmount();
+
+        // Modify amounts
+        debitTransaction.setAmount(form.getAmount());
+        creditTransaction.setAmount(form.getAmount());
+
+        // Get accounts
+        Account debitAccount = debitTransaction.getAccount();
+        Account creditAccount = creditTransaction.getAccount();
+
+        // Update account balances
+        creditAccount.setBalance(creditAccount.getBalance().subtract(oldCreditAmount).add(form.getAmount()));
+        debitAccount.setBalance(debitAccount.getBalance().add(oldDebitAmount).subtract(form.getAmount()));
+
+        // Save changes
+        transactionsRecordRepo.saveAndFlush(debitTransaction);
+        transactionsRecordRepo.saveAndFlush(creditTransaction);
+        accountsRepo.saveAndFlush(debitAccount);
+        accountsRepo.saveAndFlush(creditAccount);
+        transactionsRepo.saveAndFlush(transaction);
+
+        // return transaction
+        return new ResponseEntity<>(transaction, HttpStatus.OK);
+    }
+
     public static class NewTransactionForm {
         public String description;
         public String originIban;
@@ -128,6 +171,36 @@ public class TransactionManagers {
 
         public void setAmount(BigDecimal amount) {
             this.amount = amount;
+        }
+    }
+
+    public class EditTransactionForm {
+        public Long id;
+        public BigDecimal amount;
+        public LocalDateTime localDateTime;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public BigDecimal getAmount() {
+            return amount;
+        }
+
+        public void setAmount(BigDecimal amount) {
+            this.amount = amount;
+        }
+
+        public LocalDateTime getLocalDateTime() {
+            return localDateTime;
+        }
+
+        public void setLocalDateTime(LocalDateTime localDateTime) {
+            this.localDateTime = localDateTime;
         }
     }
 }
