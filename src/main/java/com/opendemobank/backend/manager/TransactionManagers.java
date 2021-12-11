@@ -44,16 +44,25 @@ public class TransactionManagers {
         // Create debit transaction record
         TransactionRecord debitTransaction = new TransactionRecord();
         debitTransaction.setAmount(form.getAmount());
-        debitTransaction.setCurrency(currencyRepo.getById(1L)); // TODO fix currency
+        if (originAccount != null) {
+            debitTransaction.setCurrency(originAccount.getCurrency());
+        } else {
+            debitTransaction.setCurrency(currencyRepo.findByCode("EUR"));
+        }
         debitTransaction.setAccount(originAccount);
         debitTransaction.setDirection(Direction.DEBIT);
         transactionsRecordRepo.saveAndFlush(debitTransaction);
 
+        BigDecimal receiverAmount = Currency.convert(
+                form.getAmount(),
+                debitTransaction.getCurrency().getRate(),
+                destinationAccount.getCurrency().getRate());
+
 
         // Create credit transaction record
         TransactionRecord creditTransaction = new TransactionRecord();
-        creditTransaction.setCurrency(currencyRepo.getById(1L)); // TODO fix currency
-        creditTransaction.setAmount(form.getAmount());
+        creditTransaction.setCurrency(destinationAccount.getCurrency());
+        creditTransaction.setAmount(receiverAmount);
         creditTransaction.setAccount(destinationAccount);
         creditTransaction.setDirection(Direction.CREDIT);
         transactionsRecordRepo.saveAndFlush(creditTransaction);
@@ -86,11 +95,11 @@ public class TransactionManagers {
         transactionsRecordRepo.saveAndFlush(creditTransaction);
 
         if (originAccount != null) {
-            originAccount.setBalance(originAccount.getBalance().subtract(form.getAmount()));
+            originAccount.setBalance(originAccount.getBalance().subtract(debitTransaction.getAmount()));
             accountsRepo.saveAndFlush(originAccount);
         }
 
-        destinationAccount.setBalance(destinationAccount.getBalance().add(form.getAmount()));
+        destinationAccount.setBalance(destinationAccount.getBalance().add(creditTransaction.getAmount()));
         accountsRepo.saveAndFlush(destinationAccount);
 
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
@@ -123,15 +132,21 @@ public class TransactionManagers {
 
         // Modify amounts
         debitTransaction.setAmount(form.getAmount());
-        creditTransaction.setAmount(form.getAmount());
+
+        BigDecimal receiverAmount = Currency.convert(
+                form.getAmount(),
+                debitTransaction.getCurrency().getRate(),
+                creditTransaction.getCurrency().getRate());
+
+        creditTransaction.setAmount(receiverAmount);
 
         // Get accounts
         Account debitAccount = debitTransaction.getAccount();
         Account creditAccount = creditTransaction.getAccount();
 
         // Update account balances
-        creditAccount.setBalance(creditAccount.getBalance().subtract(oldCreditAmount).add(form.getAmount()));
-        debitAccount.setBalance(debitAccount.getBalance().add(oldDebitAmount).subtract(form.getAmount()));
+        creditAccount.setBalance(creditAccount.getBalance().subtract(oldCreditAmount).add(creditTransaction.getAmount()));
+        debitAccount.setBalance(debitAccount.getBalance().add(oldDebitAmount).subtract(debitTransaction.getAmount()));
 
         // Save changes
         transactionsRecordRepo.saveAndFlush(debitTransaction);

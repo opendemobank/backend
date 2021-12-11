@@ -19,10 +19,10 @@ public class TransferManagers {
 
     @Autowired
     UsersRepo usersRepo;
-    
+
     @Autowired
     AccountsRepo accountsRepo;
-    
+
     @Autowired
     CustomersRepo customersRepo;
 
@@ -33,16 +33,15 @@ public class TransferManagers {
     TransactionsRepo transactionsRepo;
 
 
-
     public ResponseEntity<Transfer> createTransfer(User currentUser, CreateTransferForm form) {
         // Get Sender Account by Iban
         Account senderAccount = accountsRepo.findByIBAN(form.getSenderIBAN());
-        
+
         // Check if account exists
         if (senderAccount == null || !senderAccount.isActive()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
+
         // Check if user is owner of account
         if (!senderAccount.getCustomer().getId().equals(currentUser.getId())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -52,9 +51,9 @@ public class TransferManagers {
         if (senderAccount.getBalance().compareTo(form.getAmount()) < 0) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        
+
         Optional<Account> recipientAccount = Optional.empty();
-        
+
         // Get Receiver account
         if (form.getRecieverIBAN() != null) {
             recipientAccount = Optional.ofNullable(accountsRepo.findByIBAN(form.getRecieverIBAN()));
@@ -71,7 +70,7 @@ public class TransferManagers {
                 recipientAccount = customer.getAccounts().stream().filter(account -> account.getAccountType().equals(AccountType.PRIMARY)).findFirst();
             }
         }
-        
+
         // Check if account exists and account is active
         if (!recipientAccount.isPresent() || !recipientAccount.get().isActive() || !recipientAccount.get().getCustomer().isActive()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -85,9 +84,14 @@ public class TransferManagers {
         debitTransactionRecord.setCurrency(senderAccount.getCurrency());
         transactionsRecordRepo.saveAndFlush(debitTransactionRecord);
 
+        BigDecimal receiverAmount = Currency.convert(
+                form.getAmount(),
+                debitTransactionRecord.getCurrency().getRate(),
+                recipientAccount.get().getCurrency().getRate());
+
         // Create credit transaction record
         TransactionRecord creditTransactionRecord = new TransactionRecord();
-        creditTransactionRecord.setAmount(form.getAmount());
+        creditTransactionRecord.setAmount(receiverAmount);
         creditTransactionRecord.setAccount(recipientAccount.get());
         creditTransactionRecord.setDirection(Direction.CREDIT);
         creditTransactionRecord.setCurrency(recipientAccount.get().getCurrency());
@@ -103,11 +107,11 @@ public class TransferManagers {
         transfersRepo.saveAndFlush(transfer);
 
         // Update sender account balance
-        senderAccount.setBalance(senderAccount.getBalance().subtract(form.getAmount()));
+        senderAccount.setBalance(senderAccount.getBalance().subtract(debitTransactionRecord.getAmount()));
         accountsRepo.saveAndFlush(senderAccount);
 
         // Update receiver account balance
-        recipientAccount.get().setBalance(recipientAccount.get().getBalance().add(form.getAmount()));
+        recipientAccount.get().setBalance(recipientAccount.get().getBalance().add(creditTransactionRecord.getAmount()));
         accountsRepo.saveAndFlush(recipientAccount.get());
 
         // Create Transaction
