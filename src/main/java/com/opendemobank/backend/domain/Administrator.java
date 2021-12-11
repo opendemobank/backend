@@ -9,7 +9,10 @@ public class Administrator extends User {
 
     @Override
     public Role getRole() {
-        return Role.ADMIN;
+        if (super.isActive())
+            return Role.ADMIN;
+        else
+            return Role.INACTIVE;
     }
 
     @Override
