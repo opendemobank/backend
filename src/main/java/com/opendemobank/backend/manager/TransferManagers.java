@@ -39,7 +39,7 @@ public class TransferManagers {
         Account senderAccount = accountsRepo.findByIBAN(form.getSenderIBAN());
         
         // Check if account exists
-        if (senderAccount == null) {
+        if (senderAccount == null || !senderAccount.isActive()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         
@@ -72,8 +72,8 @@ public class TransferManagers {
             }
         }
         
-        // Check if account exists
-        if (!recipientAccount.isPresent()) {
+        // Check if account exists and account is active
+        if (!recipientAccount.isPresent() || !recipientAccount.get().isActive() || !recipientAccount.get().getCustomer().isActive()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 

@@ -33,7 +33,11 @@ public class TransactionManagers {
         Account originAccount = accountsRepo.findByIBAN(form.getOriginIban());
         Account destinationAccount = accountsRepo.findByIBAN(form.getEndIban());
 
-        if (destinationAccount == null) {
+        if (destinationAccount == null || !destinationAccount.isActive() || !destinationAccount.getCustomer().isActive()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (originAccount != null && (!originAccount.isActive() || !originAccount.getCustomer().isActive())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 

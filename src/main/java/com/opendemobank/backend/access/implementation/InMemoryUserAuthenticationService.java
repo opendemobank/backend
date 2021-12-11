@@ -4,7 +4,6 @@ import com.opendemobank.backend.access.UserAuthenticationService;
 import com.opendemobank.backend.domain.User;
 import com.opendemobank.backend.repository.UsersRepo;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,7 +31,7 @@ final class InMemoryUserAuthenticationService implements UserAuthenticationServi
     public Optional<String> login(String email, String password) {
         User user = usersRepo.findUserByEmail(email);
 
-        if (user == null) return Optional.empty();
+        if (user == null || !user.isActive()) return Optional.empty();
 
         if (new BCryptPasswordEncoder().matches(password, user.getPassword())) {
             logout(user);

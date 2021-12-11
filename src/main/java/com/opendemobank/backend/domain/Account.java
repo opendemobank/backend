@@ -45,6 +45,10 @@ public class Account {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "account", cascade = CascadeType.ALL)
     private List<TransactionRecord> transactionRecords;
 
+    @JsonIgnore
+    @Column(name = "active")
+    private boolean active = true;
+
     public long getId() {
         return id;
     }
@@ -58,7 +62,10 @@ public class Account {
     }
 
     public AccountType getAccountType() {
-        return accountType;
+        if (isActive())
+            return accountType;
+        else
+            return AccountType.INACTIVE;
     }
 
     public void setAccountType(AccountType accountType) {
@@ -103,6 +110,15 @@ public class Account {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    @JsonIgnore
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override
