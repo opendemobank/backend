@@ -56,7 +56,7 @@ public class TransactionManagers {
 
         // Create transfer
         Transfer transfer = new Transfer();
-        transfer.setSessionUser(destinationAccount.getCustomer());
+        transfer.setSessionUser(currentUser);
         transfer.setDescription(form.getDescription());
         transfer.setReceiversFullName(destinationAccount.getCustomer().getFullName());
         transfer.setAccountIBAN(destinationAccount.getIBAN());
