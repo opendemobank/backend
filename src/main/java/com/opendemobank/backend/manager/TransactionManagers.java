@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class TransactionManagers {
@@ -105,13 +106,15 @@ public class TransactionManagers {
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<Transaction> editTransaction(User currentUser, long id, EditTransactionForm form) {
+    public ResponseEntity<Transaction> editTransaction(User currentUser, EditTransactionForm form) {
         // Check if transaction with id exists
-        Transaction transaction = transactionsRepo.findById(id);
+        Optional<Transaction> transactionOpt = transactionsRepo.findById(form.getId());
 
-        if (transaction == null) {
+        if (transactionOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        Transaction transaction = transactionOpt.get();
 
         // Check if transaction already corrected
         if (transaction.getTransactionStatus() != TransactionStatus.OK) {
@@ -159,14 +162,16 @@ public class TransactionManagers {
         return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 
-    public ResponseEntity<Transaction> stornoTransaction(User currentUser, long id, StronoTransactionForm form) {
+    public ResponseEntity<Transaction> stornoTransaction(User currentUser, StronoTransactionForm form) {
         // Check if transaction with id exists
-        Transaction transaction = transactionsRepo.findById(id);
+        Optional<Transaction> transactionOpt = transactionsRepo.findById(form.getId());
 
         // Check if transaction exists
-        if (transaction == null) {
+        if (transactionOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        Transaction transaction = transactionOpt.get();
 
         // Check if transaction status is OK or CORECTION
         if (transaction.getTransactionStatus() != TransactionStatus.OK && transaction.getTransactionStatus() != TransactionStatus.CORECTION) {
@@ -295,5 +300,13 @@ public class TransactionManagers {
 
     public class StronoTransactionForm {
         public Long id;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
     }
 }
