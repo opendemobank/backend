@@ -100,6 +100,11 @@ public class TransactionManagers {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        // Check if transaction already corrected
+        if (transaction.getTransactionStatus() != TransactionStatus.OK) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         // Edit transaction timestamp and amount
         transaction.setLocalDateTime(form.getLocalDateTime());
         transaction.setTransactionStatus(TransactionStatus.CORECTION);
