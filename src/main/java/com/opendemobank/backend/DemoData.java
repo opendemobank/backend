@@ -39,6 +39,12 @@ public class DemoData {
     @EventListener
     public void appReady(ApplicationReadyEvent event) {
         // Create initial currency for in memory database during development
+
+        // Don't seed if data exists
+        if (currencyRepo.findAll().size() != 0) {
+            return;
+        }
+
         Currency currency1 = new Currency();
         currency1.setCode("USD");
         currency1.setName("US Dollar");
