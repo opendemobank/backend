@@ -76,7 +76,7 @@ public class TransactionController {
 
 
     // POST edit transaction
-    @PostMapping(value = "/edit/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/edit", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Transaction> editTransaction(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @RequestBody TransactionManagers.EditTransactionForm form) {
         // if currentUser is not admin, return auth fail
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -85,7 +85,7 @@ public class TransactionController {
     }
 
     // POST storno transaction
-    @PostMapping(value = "/storno/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/storno", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Transaction> stornoTransaction(@Parameter(hidden = true) @AuthenticationPrincipal User currentUser, @RequestBody TransactionManagers.StronoTransactionForm form) {
         // if currentUser is not admin, return auth fail
         if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
