@@ -212,8 +212,8 @@ public class TransactionManagers {
         transactionsRecordRepo.saveAndFlush(debitTransaction);
         transactionsRecordRepo.saveAndFlush(creditTransaction);
 
-        transaction.setDebitTransactionRecord(creditTransaction);
-        transaction.setDebitTransactionRecord(debitTransaction);
+        newTransaction.setDebitTransactionRecord(creditTransaction);
+        newTransaction.setDebitTransactionRecord(debitTransaction);
 
         // Save transaction
         transactionsRepo.saveAndFlush(newTransaction);
