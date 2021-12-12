@@ -180,6 +180,7 @@ public class TransactionManagers {
 
         // Set transaction status to STORNED
         transaction.setTransactionStatus(TransactionStatus.STORNED);
+        transactionsRepo.saveAndFlush(transaction);
 
         // Make new transaction reversing old transaction
         Transaction newTransaction = new Transaction();
@@ -206,12 +207,16 @@ public class TransactionManagers {
         creditTransaction.setTransaction(newTransaction);
         creditTransaction.setDirection(Direction.CREDIT);
 
+
         // Save new transaction records
         transactionsRecordRepo.saveAndFlush(debitTransaction);
         transactionsRecordRepo.saveAndFlush(creditTransaction);
 
+        transaction.setDebitTransactionRecord(creditTransaction);
+        transaction.setDebitTransactionRecord(debitTransaction);
+
         // Save transaction
-        transactionsRepo.saveAndFlush(transaction);
+        transactionsRepo.saveAndFlush(newTransaction);
 
         // Get accounts
         Account debitAccount = debitTransaction.getAccount();
