@@ -1,5 +1,8 @@
 package com.opendemobank.backend.manager;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.opendemobank.backend.domain.*;
 import com.opendemobank.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,10 @@ public class TransactionManagers {
     @Autowired
     CurrencyRepo currencyRepo;
 
+    @Autowired
+    TransactionsLogRepo transactionsLogRepo;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JSR310Module());
 
     public ResponseEntity<Transaction> createTransaction(User currentUser, NewTransactionForm form) {
         Account originAccount = accountsRepo.findByIBAN(form.getOriginIban());
@@ -103,6 +110,18 @@ public class TransactionManagers {
         destinationAccount.setBalance(destinationAccount.getBalance().add(creditTransaction.getAmount()));
         accountsRepo.saveAndFlush(destinationAccount);
 
+        // Create transaction log
+        TransactionLog transactionsLog = new TransactionLog();
+        transactionsLog.setSessionUser(currentUser);
+        try {
+            transactionsLog.setNewJson(objectMapper.writeValueAsString(transaction));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        transactionsLogRepo.saveAndFlush(transactionsLog);
+
+
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 
@@ -115,6 +134,16 @@ public class TransactionManagers {
         }
 
         Transaction transaction = transactionOpt.get();
+
+        // Create transaction log
+        TransactionLog transactionsLog = new TransactionLog();
+        transactionsLog.setSessionUser(currentUser);
+        try {
+            transactionsLog.setOldJson(objectMapper.writeValueAsString(transaction));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
 
         // Check if transaction already corrected
         if (transaction.getTransactionStatus() != TransactionStatus.OK) {
@@ -157,6 +186,15 @@ public class TransactionManagers {
         accountsRepo.saveAndFlush(debitAccount);
         accountsRepo.saveAndFlush(creditAccount);
         transactionsRepo.saveAndFlush(transaction);
+
+        try {
+            transactionsLog.setNewJson(objectMapper.writeValueAsString(transaction));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        transactionsLogRepo.saveAndFlush(transactionsLog);
+
 
         // return transaction
         return new ResponseEntity<>(transaction, HttpStatus.OK);
