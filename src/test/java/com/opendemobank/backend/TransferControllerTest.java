@@ -51,6 +51,7 @@ public class TransferControllerTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     public void testDontShowTransferByIdToUnauthorizedUser() throws Exception {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/transfers/1")
