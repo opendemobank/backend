@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -108,6 +110,30 @@ public class AccountController {
         else
             account.setAccountType(AccountType.PRIMARY);
 
+        Account newAccount = accountsRepo.saveAndFlush(account);
+        newAccount.setIBAN(Account.generateIBAN(account.getId()));
+
+        return new ResponseEntity<>(accountsRepo.save(newAccount), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/customer/{id}/new")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Account> createAccount(
+            @Parameter(hidden = true) @AuthenticationPrincipal final User currentUser,
+            @PathVariable("id") long id,
+            @Valid @RequestBody Account account,
+            @Parameter(hidden = true) BindingResult bindingResult) {
+
+        if (!currentUser.getRole().equals(Role.ADMIN)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        Customer customer = customersRepo.findById(id);
+        if (customer == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if (bindingResult.hasErrors())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        account.setCustomer(customer);
         Account newAccount = accountsRepo.saveAndFlush(account);
         newAccount.setIBAN(Account.generateIBAN(account.getId()));
 
