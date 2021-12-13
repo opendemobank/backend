@@ -66,7 +66,7 @@ public class CustomerController {
         customersRepo.saveAndFlush(customer);
         for (Account account : customer.getAccounts()) {
             account.setCustomer(customer);
-            account.setCurrency(currencyRepo.getById(1L));
+            account.setCurrency(account.getCurrency() == null ? currencyRepo.findByCode("EUR") : account.getCurrency());
             account.setIBAN(Account.generateIBAN(account.getId()));
         }
         return new ResponseEntity<>(customersRepo.save(customer), HttpStatus.CREATED);
