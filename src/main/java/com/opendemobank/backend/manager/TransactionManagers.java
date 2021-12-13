@@ -55,7 +55,7 @@ public class TransactionManagers {
         if (originAccount != null) {
             debitTransaction.setCurrency(originAccount.getCurrency());
         } else {
-            debitTransaction.setCurrency(currencyRepo.findByCode("EUR"));
+            debitTransaction.setCurrency(destinationAccount.getCurrency());
         }
         debitTransaction.setAccount(originAccount);
         debitTransaction.setDirection(Direction.DEBIT);

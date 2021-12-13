@@ -7,6 +7,7 @@ import org.iban4j.Iban;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Account {
     private Currency currency;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "account", cascade = CascadeType.ALL)
-    private List<TransactionRecord> transactionRecords;
+    private List<TransactionRecord> transactionRecords = new ArrayList<>();
 
     @JsonIgnore
     @Column(name = "active")

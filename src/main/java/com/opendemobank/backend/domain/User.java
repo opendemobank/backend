@@ -33,7 +33,7 @@ public abstract class User implements UserDetails {
     private String password;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sessionUser", cascade = CascadeType.ALL)
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<>();
 
     @JsonIgnore
     @Column(name = "active")
