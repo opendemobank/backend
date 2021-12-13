@@ -1,9 +1,11 @@
 package com.opendemobank.backend.controller;
 
+import com.opendemobank.backend.domain.Account;
 import com.opendemobank.backend.domain.Role;
 import com.opendemobank.backend.domain.Transfer;
 import com.opendemobank.backend.domain.User;
 import com.opendemobank.backend.manager.TransferManagers;
+import com.opendemobank.backend.repository.AccountsRepo;
 import com.opendemobank.backend.repository.TransfersRepo;
 import com.opendemobank.backend.repository.UsersRepo;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,6 +28,9 @@ public class TransferController {
 
     @Autowired
     UsersRepo usersRepo;
+
+    @Autowired
+    AccountsRepo accountsRepo;
 
     @Autowired
     TransferManagers transferManager;
@@ -64,6 +69,22 @@ public class TransferController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         List<Transfer> transfers = transfersRepo.findAllBySessionUserId(id);
+
+        return new ResponseEntity<>(transfers, HttpStatus.OK);
+    }
+
+    @GetMapping("/account/{iban}")
+    public ResponseEntity<List<Transfer>> getAllByAccountIBAN(
+            @Parameter(hidden = true) @AuthenticationPrincipal User currentUser,
+            @PathVariable("iban") String iban) {
+        Account account = accountsRepo.findByIBAN(iban);
+        if (account == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if (!Objects.equals(currentUser.getId(), account.getCustomer().getId()) && currentUser.getRole() != Role.ADMIN)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        List<Transfer> transfers = transfersRepo.findAllByAccountIBAN(iban);
 
         return new ResponseEntity<>(transfers, HttpStatus.OK);
     }

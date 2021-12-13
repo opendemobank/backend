@@ -12,4 +12,6 @@ public interface TransfersRepo extends JpaRepository<Transfer, Long> {
 
         List<Transfer> findAllBySessionUserId(long id);
 
+        List<Transfer> findAllByAccountIBAN(String iban);
+
 }
