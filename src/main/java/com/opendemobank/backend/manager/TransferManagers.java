@@ -99,6 +99,8 @@ public class TransferManagers {
 
         // Create transfer
         Transfer transfer = new Transfer();
+        transfer.setSenderUser(senderAccount.getCustomer());
+        transfer.setReceiverUser(recipientAccount.get().getCustomer());
         transfer.setSessionUser(currentUser);
         transfer.setDescription(form.getDescription());
         transfer.setReceiversFullName(recipientAccount.get().getCustomer().getFullName());

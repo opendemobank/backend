@@ -77,6 +77,8 @@ public class TransactionManagers {
 
         // Create transfer
         Transfer transfer = new Transfer();
+        if (originAccount != null) transfer.setSenderUser(originAccount.getCustomer());
+        transfer.setReceiverUser(destinationAccount.getCustomer());
         transfer.setSessionUser(currentUser);
         transfer.setDescription(form.getDescription());
         transfer.setReceiversFullName(destinationAccount.getCustomer().getFullName());

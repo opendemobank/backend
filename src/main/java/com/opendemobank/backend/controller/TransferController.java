@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,8 +46,16 @@ public class TransferController {
         if (transfer == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        // only return the transfer when it was created by the logged-in user or an admin
+        // only return the transfer when receiver or sender was a part of the transaction or an admin
         if (Objects.equals(currentUser.getId(), transfer.getSessionUser().getId()) || currentUser.getRole().equals(Role.ADMIN))
+            return new ResponseEntity<>(transfer, HttpStatus.OK);
+
+        // only return the transfer when receiver or sender was a part of the transaction or an admin
+        if (transfer.getReceiverUser() != null && Objects.equals(currentUser.getId(), transfer.getReceiverUser().getId()))
+            return new ResponseEntity<>(transfer, HttpStatus.OK);
+
+        // only return the transfer when receiver or sender was a part of the transaction or an admin
+        if (transfer.getSenderUser() != null && Objects.equals(currentUser.getId(), transfer.getSenderUser().getId()))
             return new ResponseEntity<>(transfer, HttpStatus.OK);
 
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -68,7 +77,14 @@ public class TransferController {
         if (currentUser.getId() != id && currentUser.getRole() != Role.ADMIN)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        List<Transfer> transfers = transfersRepo.findAllBySessionUserId(id);
+        List<Transfer> transfers = transfersRepo.findAllBySessionUserIdOrReceiverUser_IdOrSenderUser_Id(id, id, id);
+
+        for (Transfer transfer : transfers) {
+            if (transfer.getSenderUser() != null && transfer.getSenderUser().getId() == id) {
+                // Multiply transfer by -1 galaxy brain hack
+                transfer.setAmount(transfer.getAmount().multiply(new BigDecimal(-1)));
+            }
+        }
 
         return new ResponseEntity<>(transfers, HttpStatus.OK);
     }

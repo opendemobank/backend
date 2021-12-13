@@ -19,6 +19,16 @@ public class Transfer {
     @JsonIgnore
     private User sessionUser;
 
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    @JsonIgnore
+    private User senderUser;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    @JsonIgnore
+    private User receiverUser;
+
     @Column(name = "description")
     private String description;
 
@@ -80,4 +90,19 @@ public class Transfer {
         this.amount = amount;
     }
 
+    public User getSenderUser() {
+        return senderUser;
+    }
+
+    public void setSenderUser(User senderUser) {
+        this.senderUser = senderUser;
+    }
+
+    public User getReceiverUser() {
+        return receiverUser;
+    }
+
+    public void setReceiverUser(User receiverUser) {
+        this.receiverUser = receiverUser;
+    }
 }
